@@ -1,0 +1,23 @@
+[project]
+name = "syllabus-extractor"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "kanikama0601", email = "kanikama0601school@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "beautifulsoup4>=4.15.0",
+    "httpx>=0.28.1",
+    "playwright>=1.63.0",
+    "pypdf>=6.19.0",
+    "questionary>=2.1.1",
+]
+
+[project.scripts]
+syllabus-extractor = "syllabus_extractor:main"
+
+[build-system]
+requires = ["uv_build>=0.12.3,<0.13.0"]
+build-backend = "uv_build"
