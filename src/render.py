@@ -10,8 +10,10 @@ from __future__ import annotations
 
 import html
 import re
+from collections.abc import Collection
 
-from bs4 import BeautifulSoup, NavigableString, Tag
+from bs4 import BeautifulSoup
+from bs4.element import NavigableString, Tag
 
 # セクションごとの列幅 (%)。列数が一致しない場合は均等割り
 COLUMN_WIDTHS: dict[str, list[float]] = {
@@ -214,7 +216,7 @@ def _table(rows: list[str], widths: list[float] | None = None, cls: str = "") ->
 
 def _span(cell: Tag, name: str) -> int:
     try:
-        return max(1, int(cell.get(name, 1)))
+        return max(1, int(str(cell.get(name) or 1)))
     except ValueError:
         return 1
 
@@ -282,7 +284,7 @@ def _fold_span_only_rows(rows: list[list[Cell]]) -> list[list[Cell]]:
     return rows
 
 
-def _convert_table(table: Tag, section: str, skip_labels: set[str] = frozenset()) -> str:
+def _convert_table(table: Tag, section: str, skip_labels: Collection[str] = ()) -> str:
     rows: list[list[Cell]] = []
     for tr in table.find_all("tr"):
         if tr.find_parent("table") is not table:

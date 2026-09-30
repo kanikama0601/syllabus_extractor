@@ -19,7 +19,7 @@ uv run playwright install chromium
 ## 使い方
 
 ```sh
-uv run syllabus-extractor
+uv run main.py
 ```
 
 1. 学科を選択

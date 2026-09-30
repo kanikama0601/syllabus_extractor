@@ -10,8 +10,8 @@ from pathlib import Path
 
 import questionary
 
-from .merge import merge_pdfs
-from .scraper import Department, Subject, fetch_departments, fetch_subjects_for_grade, make_client
+from merge import merge_pdfs
+from scraper import Department, Subject, fetch_departments, fetch_subjects_for_grade, make_client
 
 
 def current_school_year(today: date | None = None) -> int:
@@ -124,7 +124,7 @@ def main() -> None:
     print(f"\n合計 {total} 科目を PDF 化します")
 
     # Playwright は PDF 化の段階でのみ読み込む (ブラウザ未インストール時のエラーを遅らせる)
-    from .pdf import SyllabusPrinter
+    from pdf import SyllabusPrinter
 
     out_root = args.output / safe_filename(department.name)
     failures: list[str] = []
@@ -134,6 +134,8 @@ def main() -> None:
         for g, year, subjects in plan:
             printed: list[tuple[str, Path]] = []
             for s in subjects:
+                if s.url is None:  # choose_subjects はシラバスのある科目だけを返すので通常は起きない
+                    continue
                 done += 1
                 # 例: 26開講情報工学科（2019年度以降入学者）5画像工学.pdf
                 filename = safe_filename(f"{year % 100:02d}開講{department.name}{g}{s.name}") + ".pdf"

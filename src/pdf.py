@@ -10,11 +10,15 @@ from __future__ import annotations
 
 import time
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from playwright.sync_api import Browser, BrowserContext, Page, sync_playwright
 
-from .render import CONTENT_HEIGHT_MM, PAGINATE_JS, PRINT_SCALE, build_official_html
-from .scraper import USER_AGENT
+if TYPE_CHECKING:
+    from playwright._impl._api_structures import StorageState
+
+from render import CONTENT_HEIGHT_MM, PAGINATE_JS, PRINT_SCALE, build_official_html
+from scraper import USER_AGENT
 
 # シラバス本文が表示されていることの目印
 CONTENT_MARKER = "科目基礎情報"
@@ -34,7 +38,7 @@ class SyllabusPrinter:
         self._browser: Browser = self._pw.chromium.launch(headless=True)
         self._context: BrowserContext = self._new_context()
 
-    def _new_context(self, storage_state: dict | None = None) -> BrowserContext:
+    def _new_context(self, storage_state: StorageState | None = None) -> BrowserContext:
         return self._browser.new_context(
             user_agent=USER_AGENT,
             locale="ja-JP",

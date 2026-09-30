@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from urllib.parse import parse_qs, urljoin, urlparse
 
@@ -54,10 +55,10 @@ def fetch_departments(client: httpx.Client, school_id: int = KAGAWA_SCHOOL_ID) -
     seen: set[int] = set()
     for heading in soup.select("h4.list-group-item-heading"):
         row = heading.find_parent("div", class_="row")
-        link = row.find("a", href=lambda h: h and "PublicSubjects" in h) if row else None
+        link = row.find("a", href=re.compile("PublicSubjects")) if row else None
         if link is None:
             continue
-        dep_id = int(parse_qs(urlparse(link["href"]).query)["department_id"][0])
+        dep_id = int(parse_qs(urlparse(str(link["href"])).query)["department_id"][0])
         if dep_id in seen:
             continue
         seen.add(dep_id)
@@ -102,7 +103,7 @@ def fetch_subjects_for_grade(
         seen.add(code)
 
         link = item.find("a", href=True)
-        name_el = link or item.find("span")
+        name_el = link or item.find("span") or item
         subjects.append(
             Subject(
                 name=name_el.get_text(strip=True),
@@ -110,7 +111,7 @@ def fetch_subjects_for_grade(
                 category=category,
                 credit_type=tds[idx + 2].get_text(strip=True),
                 credits=tds[idx + 3].get_text(strip=True),
-                url=urljoin(BASE_URL, link["href"]) if link else None,
+                url=urljoin(BASE_URL, str(link["href"])) if link else None,
             )
         )
     return subjects
